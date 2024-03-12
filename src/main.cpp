@@ -60,8 +60,9 @@ int main() {
   int verticeSize = sizeof(vertices) / sizeof(vertices[0]);
   int indicesSize = sizeof(indices) / sizeof(indices[0]);
 
+  Texture test;
   unsigned int Texture;
-  textures(Texture);
+  test.textures(Texture);
 
   ourshader.vertex_attrib_stuff(all, vertices, verticeSize, indices, indicesSize);
 
@@ -69,15 +70,18 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
     exit_key(window);
+
     float current_time = glfwGetTime();
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::rotate(trans, current_time, glm::vec3(0.0f, 0.0f, 1.0f));
     glUseProgram(shaderProgram);
     unsigned int transLoc = glGetUniformLocation(shaderProgram, "transform");
     glUniformMatrix4fv(transLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
     glBindTexture(GL_TEXTURE_2D, Texture);
     glBindVertexArray(all.vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
