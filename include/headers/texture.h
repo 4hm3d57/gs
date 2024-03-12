@@ -1,5 +1,7 @@
-#ifndef _TEXTURE_H
-#define _TEXTURE_H
+//#ifndef _TEXTURE_H
+//#define _TEXTURE_H
+
+#pragma once
 
 #include "../glad/glad.h"
 
@@ -13,8 +15,8 @@ void textures(unsigned int &texture) {
   glBindTexture(GL_TEXTURE_2D, texture);
 
   //texture wrapping
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   //texture filtering
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -23,10 +25,10 @@ void textures(unsigned int &texture) {
   //loading the image to be used for texturing
   int width, height, nrChannels;
   stbi_set_flip_vertically_on_load(true);
-  static const char* texturePath = "assets/textures/tsodin.png";
+  static const char* texturePath = "assets/textures/arch_linux.png";
   unsigned char *data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
   if(data){
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
   }
   else{
@@ -37,4 +39,4 @@ void textures(unsigned int &texture) {
   stbi_image_free(data);
 }
 
-#endif
+//#endif
