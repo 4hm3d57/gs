@@ -15,7 +15,12 @@
 #define HEIGHT 600
 
 void resize_func(GLFWwindow *window, int width, int height);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void exit_key(GLFWwindow *window);
+
+float squareX = 0.0f;
+float squareY = 0.0f;
+float moveSpeed = 0.5f;
 
 int main() {
   glfwInit();
@@ -31,6 +36,7 @@ int main() {
   }
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, resize_func);
+  glfwSetKeyCallback(window, key_callback);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cout << "glad failed" << std::endl;
@@ -55,7 +61,7 @@ int main() {
   unsigned int shaderProgram;
   Shaders ourshader;
 
-  ourshader.shaders("shaders/default.vert", "shaders/default.frag", shaderProgram);
+  ourshader.vfshaders("shaders/default.vert", "shaders/default.frag", shaderProgram);
 
   int verticeSize = sizeof(vertices) / sizeof(vertices[0]);
   int indicesSize = sizeof(indices) / sizeof(indices[0]);
@@ -69,14 +75,21 @@ int main() {
   glUseProgram(shaderProgram);
 
   while (!glfwWindowShouldClose(window)) {
+    glClear(GL_COLOR_BUFFER_BIT);
+
     exit_key(window);
 
-    float current_time = glfwGetTime();
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, current_time, glm::vec3(0.0f, 0.0f, 1.0f));
+    //float rotate_time = glfwGetTime();
+    //glm::mat4 trans = glm::mat4(1.0f);
+    //trans = glm::rotate(trans, rotate_time, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(squareX, squareY, 0.0f));
+
     glUseProgram(shaderProgram);
-    unsigned int transLoc = glGetUniformLocation(shaderProgram, "transform");
-    glUniformMatrix4fv(transLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    //unsigned int transLoc = glGetUniformLocation(shaderProgram, "transform");
+    unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
+    //glUniformMatrix4fv(transLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
     glBindTexture(GL_TEXTURE_2D, Texture);
     glBindVertexArray(all.vao);
@@ -96,6 +109,27 @@ int main() {
 
 void resize_func(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if(action == GLFW_PRESS || action == GLFW_REPEAT){
+        switch(key){
+            case GLFW_KEY_UP:
+                squareY += moveSpeed;
+                break;
+            case GLFW_KEY_DOWN:
+                squareY -= moveSpeed;
+                break;
+            case GLFW_KEY_LEFT:
+                squareX -= moveSpeed;
+                break;
+            case GLFW_KEY_RIGHT:
+                squareX += moveSpeed;
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void exit_key(GLFWwindow *window) {

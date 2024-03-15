@@ -17,8 +17,8 @@ struct vba {
 
 class Shaders{
 public:
-  void shaders(const char *vertexPath, const char *fragmentPath, unsigned int &shaderprogram) {
-
+  void vfshaders(const char *vertexPath, const char *fragmentPath, unsigned int &shaderprogram) {
+    
     std::ifstream vshaderFile(vertexPath), fshaderFile(fragmentPath);
     
     if (!vshaderFile.is_open() || !fshaderFile.is_open()) {
@@ -28,10 +28,10 @@ public:
     
     std::string vertexCode((std::istreambuf_iterator<char>(vshaderFile)), std::istreambuf_iterator<char>());
     std::string fragmentCode((std::istreambuf_iterator<char>(fshaderFile)), std::istreambuf_iterator<char>());
-
+    
     const char* vShaderSource = vertexCode.c_str();
     const char* fShaderSource = fragmentCode.c_str();
-
+    
     
     unsigned int vertexshader;
     vertexshader = glCreateShader(GL_VERTEX_SHADER);
@@ -69,7 +69,11 @@ public:
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
   }  
+  
+  
 };
+
+
 
 
 //#endif
