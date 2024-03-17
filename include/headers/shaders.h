@@ -12,10 +12,10 @@
 struct vba {
   unsigned int vao;
   unsigned int vbo;
-  unsigned int ebo;
+  //unsigned int ebo;
 };
 
-class Shaders{
+class Shaders{ 
 public:
   void vfshaders(const char *vertexPath, const char *fragmentPath, unsigned int &shaderprogram) {
     
@@ -49,19 +49,19 @@ public:
     glLinkProgram(shaderprogram);
   }
   
-  void vertex_attrib_stuff(vba &all, float vert[], int vertsize, unsigned int ind[], int indsize) {
+  void vertex_attrib_stuff(vba &all, float vert[], int vertsize) {
     glGenVertexArrays(1, &all.vao);
     
     glGenBuffers(1, &all.vbo);
-    glGenBuffers(1, &all.ebo);
+    // glGenBuffers(1, &all.ebo);
     
     glBindVertexArray(all.vao);
     
     glBindBuffer(GL_ARRAY_BUFFER, all.vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertsize, vert, GL_STATIC_DRAW);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, all.ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indsize, ind, GL_STATIC_DRAW);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, all.ebo);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indsize, ind, GL_STATIC_DRAW);
     
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);

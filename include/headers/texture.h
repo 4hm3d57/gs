@@ -27,7 +27,7 @@ public:
     //loading the image to be used for texture
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    static const char* texturePath = "assets/textures/arch_linux.png";
+    static const char* texturePath = "assets/textures/tsodin.png";
     unsigned char *data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
     if(data){
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
