@@ -5,7 +5,7 @@ CXX_FLAGS = -Wall -Wextra -Wswitch-enum -std=c++11 -pedantic -fno-exceptions -fe
 INCLUDE_FILES = -I./include
 LIB_FILES = -L./lib
 
-SOURCE_FILES = src/glad.c src/main.cpp
+SOURCE_FILES = src/glad.c src/main.cpp src/camera.cpp
 
 TARGET = window.exe
 

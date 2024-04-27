@@ -1,200 +1,160 @@
 #include "../include/glad/glad.h"
-
 #include "../include/GLFW/glfw3.h"
-
 #include "../include/headers/shaders.h"
 #include "../include/headers/texture.h"
-
-#include "../include/glm/glm.hpp"
-#include "../include/glm/gtc/matrix_transform.hpp"
-#include "../include/glm/gtc/type_ptr.hpp"
+#include "../include/headers/movement.h"
+#include "../include/headers/camera.h"
 
 #include <iostream>
 
 #define WIDTH 800
 #define HEIGHT 600
 
-void resize_func(GLFWwindow *window, int width, int height);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void exit_key(GLFWwindow* window);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void exit_key(GLFWwindow *window);
 
-float squareX = 0.0f;
-float squareY = 0.0f;
+float sideX = 0.0f;
+float sideY = 0.0f;
+float sideZ = 0.0f;
 float moveSpeed = 0.5f;
 
-int main() {
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "test", NULL, NULL);
-  if (window == NULL) {
-    std::cout << "failed to load window" << std::endl;
-    glfwTerminate();
-    return -1;
-  }
-  glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, resize_func);
-  glfwSetKeyCallback(window, key_callback);
-
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cout << "glad failed" << std::endl;
-    return -1;
-  }
+int main(){
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "test", NULL, NULL);
+    if(window == NULL){
+        std::cout << "failed to load window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, Camera::mouse_callback);
+    glfwSetScrollCallback(window, Camera::scroll_back);
 
 
-  // float vertices[] = {
-  //     // positions          // texture coords
-  //     0.5f,  0.5f,  0.0f, 1.0f, 0.0f, // top right
-  //     0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, // bottom right
-  //     -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom left
-  //     -0.5f, 0.5f,  0.0f, 0.0f, 0.0f  // top left
-  // };
+    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+        std::cout << "glad failed" << std::endl;
+        return -1;
+    }
 
-  // unsigned int indices[] = {
-  //     0, 1, 3, // first triangle
-  //     1, 2, 3  // second triangle
-  // };
-
-  float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
     
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-  };
-  
-  vba all;
-  unsigned int shaderProgram;
-  Shaders ourshader;
+    float vertices[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-  glEnable(GL_DEPTH_TEST);
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-  ourshader.vfshaders("shaders/default.vert", "shaders/default.frag", shaderProgram);
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-  int verticeSize = sizeof(vertices) / sizeof(vertices[0]);
-  // int indicesSize = sizeof(indices) / sizeof(indices[0]);
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-  Texture test;
-  unsigned int Texture;
-  test.textures(Texture);
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-  ourshader.vertex_attrib_stuff(all, vertices, verticeSize);
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
 
-  glUseProgram(shaderProgram);
+    glEnable(GL_DEPTH_TEST);
 
-  while (!glfwWindowShouldClose(window)) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    vba all;
 
-    exit_key(window);
-    
-    float rotate_time = glfwGetTime();
+    Shaders ourshader;
+    unsigned int shaderProgram;
+    ourshader.vfshaders("shaders/vert.vs", "shaders/frag.fs", shaderProgram);
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(squareX, squareY, 0.0f));
+    Texture texture;
+    unsigned int tex;
+    texture.load_texture(tex);
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, rotate_time, glm::vec3(1.0f, 1.0f, 1.0f));
+    int vertices_size = sizeof(vertices) / sizeof(vertices[0]);
+    ourshader.vertex_attrib_stuff(all, vertices, vertices_size);
 
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    Movement ourmovement;
+    Camera ourcamera;
 
 
-    glUseProgram(shaderProgram);
+    while(!glfwWindowShouldClose(window)){
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        exit_key(window);
 
-    unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
-    unsigned int transLoc = glGetUniformLocation(shaderProgram, "transform");
-    unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
-    unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(transLoc, 1, GL_FALSE, glm::value_ptr(trans));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        ourmovement.songa(sideX, sideY, sideZ, shaderProgram);
+        ourcamera.see(shaderProgram);
+        glUseProgram(shaderProgram);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glBindVertexArray(all.vao);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    glBindTexture(GL_TEXTURE_2D, Texture);
-    glBindVertexArray(all.vao);
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
 
-  glDeleteVertexArrays(1, &all.vao);
-  glDeleteBuffers(1, &all.vbo);
-  // glDeleteBuffers(1, &all.ebo);
-
-  glfwTerminate();
-  return 0;
+    return 0;
 }
 
-void resize_func(GLFWwindow *window, int width, int height) {
-  glViewport(0, 0, width, height);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height){
+    glViewport(0, 0, width, height);
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
-  if(action == GLFW_PRESS || action == GLFW_REPEAT){
-      switch(key){
-	case GLFW_KEY_UP:
-	      squareY += moveSpeed;
-                break;
-	case GLFW_KEY_DOWN:
-	      squareY -= moveSpeed;
-                break;
-	case GLFW_KEY_LEFT:
-	      squareX -= moveSpeed;
-                break;
-	case GLFW_KEY_RIGHT:
-	      squareX += moveSpeed;
-                break;
-	default:
-	      break;
-        }
+void exit_key(GLFWwindow* window){
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+        std::cout << "closing window" << std::endl;
+        glfwSetWindowShouldClose(window, true);
     }
 }
 
-void exit_key(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  }
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if(action == GLFW_PRESS || action == GLFW_REPEAT){
+        switch(key){
+            case GLFW_KEY_UP:
+                sideY += moveSpeed;
+                break;
+            case GLFW_KEY_DOWN:
+                sideY -= moveSpeed;
+                break;
+            case GLFW_KEY_RIGHT:
+                sideX += moveSpeed;
+                break;
+            case GLFW_KEY_LEFT:
+                sideX -= moveSpeed;
+                break;
+            default:
+                break;
+        }
+    }
 }
