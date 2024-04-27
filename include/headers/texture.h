@@ -12,7 +12,7 @@
 
 class Texture{
 public:
-  void textures(unsigned int &texture) {
+  void load_texture(unsigned int &texture) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     
